@@ -59,7 +59,10 @@ class Chat extends React.Component {
         <div id="messages">
           {messages.map(([id, content]) => {
             return (
-              <div key={id}>{`${content.email}:\n ${content.message}\n\n`}</div>
+              <div className="chatEntry" key={id}>
+                <div className="chatName">{content.email}</div>
+                <div className="chatMessage">{content.message}</div>
+              </div>
             )
           })}
         </div>

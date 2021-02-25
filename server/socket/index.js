@@ -7,23 +7,15 @@ module.exports = (io) => {
     })
 
     socket.on('add-peer', (userId, roomId) => {
-      console.log('hey im inside add-peer socket.on: ', userId, roomId)
       io.sockets.emit('dispatch-add-peer', userId, roomId)
     })
 
     socket.on('user-left', (userId) => {
-      console.log('hey im inside user-left socket.on: ', userId)
       io.sockets.emit('dispatch-user-left', userId)
     })
 
     socket.on('chat-message', (chatPayload) => {
-      console.log('im inside chat-message! ', chatPayload)
       io.sockets.emit('dispatch-chat-message', chatPayload)
-    })
-
-    socket.on('new-peer', (data) => {
-      console.log('hey im inside new-peer socket.on: ', data)
-      socket.emit('add-new-peer', data)
     })
   })
 }
