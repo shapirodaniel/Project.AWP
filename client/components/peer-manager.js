@@ -1,12 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {
-  addPeer,
-  removePeer,
-  fetchAddPeer,
-  fetchRemovePeer,
-} from '../store/rooms'
+import {addPeer, fetchAddPeer, fetchRemovePeer} from '../store/rooms'
 import CustomVideoElement from './custom-video'
 import socket from '../socket'
 import store from '../store'
@@ -18,19 +13,20 @@ export class PeerManager extends React.Component {
   constructor(props) {
     super(props)
 
-    // peer.min.js served from public/index.html
-    // the Peer constructor assigns a random ID if
-    // one isn't chosen, which is why the first arg
-    // has been declared "undefined"
+    /**
+     * The Peer constructor below is served by peer.min.js
+     * from public/index.html.
+     *
+     * It assigns a random ID if one isn't chosen,
+     * which is why the first arg to new Peer() has
+     * been declared as undefined
+     */
+
     this.self = new Peer(undefined, {
       host: 'localhost',
       port: 9000,
     })
   }
-
-  /* socket.on('dispatch-user-left', (id) => {
-      this.props.removeStreamFromRoom(this.props.room.roomId, id)
-    }) */
 
   handlePeerConnections() {
     const roomId = this.props.match.params.roomId
@@ -58,6 +54,10 @@ export class PeerManager extends React.Component {
         if (call) {
           call.on('stream', (stream) => {
             console.log(call)
+
+            /* directly dispatch peer connections
+            when this.self calls peers */
+
             store.dispatch(
               addPeer({
                 roomId: roomId,
@@ -72,12 +72,25 @@ export class PeerManager extends React.Component {
 
     this.self.on('call', (call) => {
       call.answer(myStream)
+
+      /**
+       * if this.self has an incoming call
+       * FROM this.self, the if-check below
+       * prevents us adding a duplicate stream
+       * to our video display
+       */
+
       if (call.peer === this.self._id) {
         console.log('skipping duplicate!')
         return
       }
+
       call.on('stream', (stream) => {
-        console.log(call)
+        /**
+         * directly dispatch peer connections
+         * when peers call this.self
+         */
+
         store.dispatch(
           addPeer({
             roomId: roomId,
@@ -86,9 +99,9 @@ export class PeerManager extends React.Component {
           })
         )
       })
+
       call.on('close', () => {
         this.props.removeStreamFromRoom(roomId, call.peer)
-        // store.dispatch(removePeer(call.peer))
       })
     })
   }
@@ -98,13 +111,31 @@ export class PeerManager extends React.Component {
   }
 
   componentDidUpdate() {
+    /**
+     * listen for peer disconnections
+     * to remove their dead stream
+     * from video display
+     */
+
     const roomId = this.props.match.params.roomId
+
     socket.on('dispatch-user-left', (id) => {
       this.props.removeStreamFromRoom(roomId, id)
     })
   }
 
   componentWillUnmount() {
+    /**
+     * Here, we clean up streams from our room
+     * so that we don't see dead streams if
+     * we re-enter. We then call this.self.destroy()
+     * which disconnects our peer instance from
+     * peerserver, and let the serverside socket
+     * connection know we've left so that
+     * other room participants can remove our
+     * newly-dead stream.
+     */
+
     const roomId = this.props.match.params.roomId
     const myPeers = this.props.rooms[roomId].peers
 
@@ -122,6 +153,9 @@ export class PeerManager extends React.Component {
 
   render() {
     const roomId = this.props.match.params.roomId
+
+    // convert { room userId: MediaStream } key-val pairs
+    // to array of arrays so that we can map it
     const participants = Object.entries(this.props.rooms[roomId].peers)
 
     return (
@@ -155,8 +189,5 @@ export default connect(mapState, mapDispatch)(PeerManager)
  * PROP TYPES
  */
 PeerManager.propTypes = {
-  // room needs to have at least name, port associated with it
-  // because there will need to be a different Peer instance
-  // listening to each room
   rooms: PropTypes.object.isRequired,
 }
