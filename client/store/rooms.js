@@ -31,13 +31,31 @@ export const fetchRemovePeer = (roomId, userId) => (dispatch) => {
   dispatch(removePeer({roomId, userId}))
 }
 
-export const fetchAddMessageToChat = (roomId, email, msgId, message) => (
+export const fetchAddMessageToChat = ({roomId, email, msgId, message}) => (
   dispatch
 ) => {
-  dispatch(addMessageToChat({roomId: roomId, email: email, [msgId]: message}))
+  dispatch(
+    addMessageToChat({
+      roomId,
+      email,
+      msgId,
+      message,
+    })
+  )
 }
 
-// roomIds are red, blue
+/**
+ * roomIds are red, blue
+ * chat is structured:
+ *
+ *    chat: {
+ *      msgId: {
+ *        email,
+ *        message,
+ *      }
+ *    }
+ */
+
 const rooms = {
   red: {
     id: 'red',
@@ -81,7 +99,11 @@ export default (state = rooms, action) => {
           ...state[action.roomId],
           chat: {
             ...state[action.roomId].chat,
-            [action.msgId]: action.message,
+            [action.msgId]: {
+              id: action.msgId,
+              email: action.email,
+              message: action.message,
+            },
           },
         },
       }

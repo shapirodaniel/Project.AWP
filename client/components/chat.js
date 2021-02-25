@@ -2,8 +2,9 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {fetchAddMessageToChat} from '../store/rooms'
 import socket from '../socket'
+import {v4 as uuidv4} from 'uuid'
 
-let msgId = 0
+const getMsgId = () => uuidv4()
 
 class Chat extends React.Component {
   constructor(props) {
@@ -15,12 +16,12 @@ class Chat extends React.Component {
     this.handleChange = this.handleChange.bind(this)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const roomId = this.props.roomId
-    this.props.updateMessages({
-      roomId,
-      email: this.props.user.email,
-      msgId,
+    await this.props.updateMessages({
+      roomId: roomId,
+      email: 'chat@bot.chat',
+      msgId: getMsgId(),
       message: `Welcome to the ${roomId} team ${this.props.user.email}!`,
     })
     socket.on('dispatch-chat-message', (chatPayload) => {
@@ -41,22 +42,24 @@ class Chat extends React.Component {
     const chatPayload = {
       roomId: this.props.roomId,
       email: this.props.user.email,
-      [++msgId]: this.state.message,
+      msgId: getMsgId(),
+      message: this.state.message,
     }
     socket.emit('chat-message', chatPayload)
-    console.log('socket emitted message! ', chatPayload)
-    await this.updateMessages()
+    await this.props.updateMessages(chatPayload)
   }
 
   render() {
-    const {user, rooms} = this.props
+    const roomId = this.props.roomId
+    const {rooms} = this.props || {}
+    const messages = Object.entries(rooms[roomId].chat)
     const {handleChange, handleSubmit} = this
     return (
       <div>
         <div id="messages">
-          {Object.values(rooms.chat).forEach((msg) => (
-            <div>{`${msg.email}: ${msg.message}`}</div>
-          ))}
+          {messages.map(([id, content]) => {
+            return <div key={id}>{`${content.email}: ${content.message}`}</div>
+          })}
         </div>
         <form onSubmit={handleSubmit}>
           <input
@@ -79,8 +82,6 @@ const mapState = (state) => ({
 })
 
 const mapDispatch = (dispatch) => ({
-  // chatPayload is an object containing roomId, msgId, message
-
   updateMessages: (chatPayload) => dispatch(fetchAddMessageToChat(chatPayload)),
 })
 
