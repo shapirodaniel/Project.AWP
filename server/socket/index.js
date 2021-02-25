@@ -16,6 +16,16 @@ module.exports = (io) => {
       io.sockets.emit('dispatch-user-left', userId)
     })
 
+    socket.on('chat-message', ({roomId, userEmail, message}) => {
+      console.log('hi im chatmessage')
+      console.log('hey im inside chat-message socket.on: ', {
+        roomId,
+        userEmail,
+        message,
+      })
+      io.sockets.emit('dispatch-chat-message', {roomId, userEmail, message})
+    })
+
     socket.on('new-peer', (data) => {
       console.log('hey im inside new-peer socket.on: ', data)
       socket.emit('add-new-peer', data)

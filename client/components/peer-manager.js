@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {fetchAddPeer, fetchRemovePeer} from '../store/rooms'
 import CustomVideoElement from './custom-video'
+import Chat from './chat'
 import socket from '../socket'
 
 /**
@@ -170,11 +171,16 @@ export class PeerManager extends React.Component {
      */
 
     return (
-      <div id="video-display">
-        {participants.map((participant) => {
-          const [id] = participant
-          return <CustomVideoElement key={id} id={id} roomId={roomId} />
-        })}
+      <div>
+        <div id="video-display">
+          {participants.map((participant) => {
+            const [id] = participant
+            return <CustomVideoElement key={id} id={id} roomId={roomId} />
+          })}
+        </div>
+        <div id="chat-display">
+          <Chat roomId={roomId} />
+        </div>
       </div>
     )
   }
