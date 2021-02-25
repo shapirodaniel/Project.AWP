@@ -41,6 +41,18 @@ export class PeerManager extends React.Component {
     this.connectToPeers()
   }
 
+  componentDidUpdate(prevProps) {
+    const prevPeers = Object.entries(
+      prevProps.rooms[this.props.match.params.roomId].peers
+    )
+
+    const peers = Object.entries(
+      this.props.rooms[this.props.match.params.roomId].peers
+    )
+
+    if (prevPeers.length !== peers.length) this.connectToPeers()
+  }
+
   connectToPeers() {
     const roomId = this.props.match.params.roomId
 
