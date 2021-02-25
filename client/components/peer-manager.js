@@ -19,7 +19,7 @@ export class PeerManager extends React.Component {
      *
      * It assigns a random ID if one isn't chosen,
      * which is why the first arg to new Peer() has
-     * been declared as undefined
+     * been declared as undefined.
      */
 
     this.self = new Peer(undefined, {
@@ -55,8 +55,8 @@ export class PeerManager extends React.Component {
           call.on('stream', (stream) => {
             console.log(call)
 
-            /* directly dispatch peer connections
-            when this.self calls peers */
+            /* Directly dispatch peer connections
+            when this.self calls peers. */
 
             store.dispatch(
               addPeer({
@@ -74,10 +74,10 @@ export class PeerManager extends React.Component {
       call.answer(myStream)
 
       /**
-       * if this.self has an incoming call
+       * If this.self has an incoming call
        * FROM this.self, the if-check below
        * prevents us adding a duplicate stream
-       * to our video display
+       * to our video display.
        */
 
       if (call.peer === this.self._id) {
@@ -87,8 +87,8 @@ export class PeerManager extends React.Component {
 
       call.on('stream', (stream) => {
         /**
-         * directly dispatch peer connections
-         * when peers call this.self
+         * Directly dispatch peer connections
+         * when peers call this.self.
          */
 
         store.dispatch(
@@ -112,9 +112,9 @@ export class PeerManager extends React.Component {
 
   componentDidUpdate() {
     /**
-     * listen for peer disconnections
+     * Listen for peer disconnections
      * to remove their dead stream
-     * from video display
+     * from video display.
      */
 
     const roomId = this.props.match.params.roomId
@@ -154,10 +154,6 @@ export class PeerManager extends React.Component {
   render() {
     const roomId = this.props.match.params.roomId
 
-    /* convert { room userId: MediaStream } key-val pairs
-     * on state.room to array of arrays so that we can map it
-     */
-
     const participants = Object.entries(this.props.rooms[roomId].peers)
 
     return (
@@ -181,6 +177,7 @@ const mapState = (state) => ({
 const mapDispatch = (dispatch) => ({
   addStreamToRoom: (roomId, userId, stream) =>
     dispatch(fetchAddPeer(roomId, userId, stream)),
+
   removeStreamFromRoom: (roomId, userId) =>
     dispatch(fetchRemovePeer(roomId, userId)),
 })

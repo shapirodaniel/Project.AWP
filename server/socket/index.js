@@ -6,9 +6,9 @@ module.exports = (io) => {
       console.log(`Connection ${socket.id} has left the building`)
     })
 
-    socket.on('add-peer', (userId) => {
-      console.log('hey im inside add-peer socket.on: ', userId)
-      io.sockets.emit('dispatch-add-peer', userId)
+    socket.on('add-peer', (userId, roomId) => {
+      console.log('hey im inside add-peer socket.on: ', userId, roomId)
+      io.sockets.emit('dispatch-add-peer', userId, roomId)
     })
 
     socket.on('user-left', (userId) => {
