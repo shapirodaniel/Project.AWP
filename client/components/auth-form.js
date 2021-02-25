@@ -28,9 +28,14 @@ const AuthForm = (props) => {
           <div>
             <button type="submit">{displayName}</button>
           </div>
-          {error && error.response && <div> {error.response.data} </div>}
+          {error && error.response && (
+            <div className="warning"> {error.response.data} </div>
+          )}
         </form>
-        <a href="/auth/google">{displayName} with Google</a>
+        <a href="/auth/google">
+          <img src="google-logo.webp" />
+          <span>{displayName} with Google</span>
+        </a>
       </div>
     </div>
   )
