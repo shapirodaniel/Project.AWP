@@ -12,7 +12,7 @@ class CustomVideoElement extends React.Component {
   }
 
   componentDidMount() {
-    this.stream = () => this.props.rooms[this.props.room].peers[this.props.id]
+    this.stream = () => this.props.rooms[this.props.roomId].peers[this.props.id]
     this.updateVideoStream()
   }
 

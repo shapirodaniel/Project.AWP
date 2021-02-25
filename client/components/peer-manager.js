@@ -106,41 +106,29 @@ export class PeerManager extends React.Component {
 
   componentWillUnmount() {
     const roomId = this.props.match.params.roomId
-    for (let id in this.props.rooms[roomId].peers) {
-      this.props.removeStreamFromRoom(roomId, id)
+    const myPeers = this.props.rooms[roomId].peers
+
+    for (let key in myPeers) {
+      if (myPeers[key] instanceof MediaStream)
+        this.props.removeStreamFromRoom(roomId, key)
     }
+
     const id = this.self._id
+
     this.self.destroy()
+
     socket.emit('user-left', id)
   }
 
   render() {
-    const participants = Object.entries(
-      this.props.rooms[this.props.match.params.roomId].peers
-    )
-
-    let lastSeen = ''
-    const uniqueParticipants = participants.filter((participant) => {
-      const [participantId, MediaStream] = participant
-      if (lastSeen !== MediaStream.id) {
-        lastSeen = MediaStream.id
-        return participant
-      }
-    })
-
-    console.log('uniqueParticipants after filter: ', uniqueParticipants)
+    const roomId = this.props.match.params.roomId
+    const participants = Object.entries(this.props.rooms[roomId].peers)
 
     return (
       <div id="video-display">
-        {uniqueParticipants.map((participant) => {
+        {participants.map((participant) => {
           const [id] = participant
-          return (
-            <CustomVideoElement
-              key={id}
-              id={id}
-              room={this.props.match.params.roomId}
-            />
-          )
+          return <CustomVideoElement key={id} id={id} roomId={roomId} />
         })}
       </div>
     )
