@@ -94,7 +94,6 @@ export class PeerManager extends React.Component {
        */
 
       if (call.peer === this.self._id) {
-        console.log('skipping duplicate!')
         return
       }
 
