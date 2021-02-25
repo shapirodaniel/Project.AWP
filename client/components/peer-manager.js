@@ -20,8 +20,8 @@ export class PeerManager extends React.Component {
 
     // peer.min.js served from public/index.html
     // the Peer constructor assigns a random ID if
-    // one isn't chosen, which is why we've left
-    // the first argument undefined
+    // one isn't chosen, which is why the first arg
+    // has been declared "undefined"
     this.self = new Peer(undefined, {
       host: 'localhost',
       port: 9000,
@@ -40,7 +40,7 @@ export class PeerManager extends React.Component {
 
       socket.emit('add-peer', myId)
 
-      await this.props.addStreamToRoom(roomId, myId, myStream)
+      // await this.props.addStreamToRoom(roomId, myId, myStream)
 
       socket.on('dispatch-add-peer', async (newUserId) => {
         console.log(
@@ -75,14 +75,16 @@ export class PeerManager extends React.Component {
       })
       call.on('close', () => {
         this.props.removeStreamFromRoom(roomId, call.peer)
+        store.dispatch(removePeer(call.peer))
       })
     })
   }
 
   componentWillUnmount() {
     const roomId = this.props.match.params.roomId
-    const userId = this.self._id
-    this.props.removeStreamFromRoom(roomId, userId)
+    for (let id in this.props.rooms[roomId].peers) {
+      this.props.removeStreamFromRoom(roomId, id)
+    }
   }
 
   render() {
