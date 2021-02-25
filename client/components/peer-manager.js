@@ -40,21 +40,25 @@ export class PeerManager extends React.Component {
 
       socket.emit('add-peer', myId)
 
-      // await this.props.addStreamToRoom(roomId, myId, myStream)
-
-      socket.on('dispatch-add-peer', async (newUserId) => {
+      socket.on('dispatch-add-peer', (newUserId) => {
         console.log(
           'this is add-peer data bounced back from server: ',
           newUserId
         )
-        const call = await this.self.call(newUserId, myStream)
-        store.dispatch(
-          addPeer({
-            roomId: roomId,
-            userId: call.peer,
-            stream: call._localStream,
+        const call = this.self.call(newUserId, myStream)
+
+        if (call) {
+          call.on('stream', (stream) => {
+            console.log(call)
+            store.dispatch(
+              addPeer({
+                roomId: roomId,
+                userId: call.peer,
+                stream: stream,
+              })
+            )
           })
-        )
+        }
       })
     })
 
@@ -64,18 +68,19 @@ export class PeerManager extends React.Component {
         console.log('skipping duplicate!')
         return
       }
-      call.on('stream', () => {
+      call.on('stream', (stream) => {
+        console.log(call)
         store.dispatch(
           addPeer({
             roomId: roomId,
             userId: call.peer,
-            stream: call._localStream,
+            stream: stream,
           })
         )
       })
       call.on('close', () => {
         this.props.removeStreamFromRoom(roomId, call.peer)
-        store.dispatch(removePeer(call.peer))
+        // store.dispatch(removePeer(call.peer))
       })
     })
   }
@@ -90,7 +95,18 @@ export class PeerManager extends React.Component {
   render() {
     const participants = Object.entries(
       this.props.rooms[this.props.match.params.roomId].peers
-    ).filter((peer) => peer.userId !== this.self._id)
+    )
+
+    let lastSeen = ''
+    const uniqueParticipants = participants.filter((participant) => {
+      const [participantId, MediaStream] = participant
+      if (lastSeen !== MediaStream.id) {
+        lastSeen = MediaStream.id
+        return participant
+      }
+    })
+
+    console.log('uniqueParticipants after filter: ', uniqueParticipants)
 
     return (
       <div id="video-display">
