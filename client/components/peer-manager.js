@@ -28,7 +28,11 @@ export class PeerManager extends React.Component {
     })
   }
 
-  componentDidMount() {
+  /* socket.on('dispatch-user-left', (id) => {
+      this.props.removeStreamFromRoom(this.props.room.roomId, id)
+    }) */
+
+  handlePeerConnections() {
     const roomId = this.props.match.params.roomId
     let myStream
 
@@ -89,11 +93,25 @@ export class PeerManager extends React.Component {
     })
   }
 
+  componentDidMount() {
+    this.handlePeerConnections()
+  }
+
+  componentDidUpdate() {
+    const roomId = this.props.match.params.roomId
+    socket.on('dispatch-user-left', (id) => {
+      this.props.removeStreamFromRoom(roomId, id)
+    })
+  }
+
   componentWillUnmount() {
     const roomId = this.props.match.params.roomId
     for (let id in this.props.rooms[roomId].peers) {
       this.props.removeStreamFromRoom(roomId, id)
     }
+    const id = this.self._id
+    this.self.destroy()
+    socket.emit('user-left', id)
   }
 
   render() {
@@ -114,7 +132,7 @@ export class PeerManager extends React.Component {
 
     return (
       <div id="video-display">
-        {participants.map((participant) => {
+        {uniqueParticipants.map((participant) => {
           const [id] = participant
           return (
             <CustomVideoElement

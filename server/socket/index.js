@@ -11,6 +11,11 @@ module.exports = (io) => {
       io.sockets.emit('dispatch-add-peer', userId)
     })
 
+    socket.on('user-left', (userId) => {
+      console.log('hey im inside user-left socket.on: ', userId)
+      io.sockets.emit('dispatch-user-left', userId)
+    })
+
     socket.on('new-peer', (data) => {
       console.log('hey im inside new-peer socket.on: ', data)
       socket.emit('add-new-peer', data)
