@@ -12,8 +12,7 @@ class CustomVideoElement extends React.Component {
   }
 
   componentDidMount() {
-    this.stream = () =>
-      this.props.rooms[this.props.currentRoom].peers[this.props.id]
+    this.stream = () => this.props.rooms[this.props.room].peers[this.props.id]
     this.updateVideoStream()
   }
 
@@ -22,7 +21,6 @@ class CustomVideoElement extends React.Component {
   }
 
   updateVideoStream() {
-    console.log(this.stream())
     if (this.videoRef.current.srcObject !== this.stream()) {
       this.videoRef.current.srcObject = this.stream()
     }
@@ -31,7 +29,6 @@ class CustomVideoElement extends React.Component {
 
 const mapState = (state) => ({
   rooms: state.rooms,
-  currentRoom: state.currentRoom || 'red',
 })
 
 export default connect(mapState)(CustomVideoElement)

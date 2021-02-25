@@ -59,9 +59,11 @@ export class PeerManager extends React.Component {
     })
 
     this.self.on('call', (call) => {
-      console.log('this is call received from another user, ', call)
       call.answer(myStream)
-      if (call.peer === this.self._id) return
+      if (call.peer === this.self._id) {
+        console.log('skipping duplicate!')
+        return
+      }
       call.on('stream', () => {
         store.dispatch(
           addPeer({
@@ -70,6 +72,9 @@ export class PeerManager extends React.Component {
             stream: call._localStream,
           })
         )
+      })
+      call.on('close', () => {
+        this.props.removeStreamFromRoom(roomId, call.peer)
       })
     })
   }
@@ -89,7 +94,13 @@ export class PeerManager extends React.Component {
       <div id="video-display">
         {participants.map((participant) => {
           const [id] = participant
-          return <CustomVideoElement key={id} id={id} />
+          return (
+            <CustomVideoElement
+              key={id}
+              id={id}
+              room={this.props.match.params.roomId}
+            />
+          )
         })}
       </div>
     )
