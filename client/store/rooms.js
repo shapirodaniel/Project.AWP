@@ -1,9 +1,3 @@
-import axios from 'axios'
-import history from '../history'
-
-const ADD_ROOM = 'ADD_ROOM'
-const REMOVE_ROOM = 'REMOVE_ROOM'
-
 const ADD_PEER = 'ADD_PEER'
 const REMOVE_PEER = 'REMOVE_PEER'
 

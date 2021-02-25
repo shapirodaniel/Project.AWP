@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {fetchAddPeer, fetchRemovePeer} from '../store/room'
+import {fetchAddPeer, fetchRemovePeer} from '../store/rooms'
 
 /**
  * COMPONENT
@@ -15,8 +15,8 @@ export class PeerManager extends React.Component {
     // one isn't chosen, which is why we've left
     // the first argument undefined
     this.self = new Peer(undefined, {
-      host: this.props.room.name,
-      port: this.props.room.port,
+      host: 'localhost',
+      port: 9000,
     })
   }
 
@@ -99,11 +99,12 @@ export class PeerManager extends React.Component {
 /**
  * CONTAINER
  */
-const mapState = (state) => ({
+const mapState = (state) => {
   // get room identifier from routeProps /:room wildcard
   // use it to select the room we're in
-  room: state.rooms[this.props.match.params.room],
-})
+  // room: state.rooms[this.props.match.params.room],
+  return {room: state.rooms[state.currentRoom]}
+}
 
 const mapDispatch = (dispatch) => ({
   // these thunks add userId: stream key-val pairs
