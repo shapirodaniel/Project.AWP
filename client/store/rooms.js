@@ -93,6 +93,7 @@ export default (state = rooms, action) => {
         },
       }
     case ADD_MESSAGE_TO_CHAT:
+      if (Object.values(action).some((val) => val === undefined)) return state
       return {
         ...state,
         [action.roomId]: {

@@ -58,7 +58,9 @@ class Chat extends React.Component {
       <div>
         <div id="messages">
           {messages.map(([id, content]) => {
-            return <div key={id}>{`${content.email}: ${content.message}`}</div>
+            return (
+              <div key={id}>{`${content.email}:\n ${content.message}\n\n`}</div>
+            )
           })}
         </div>
         <form onSubmit={handleSubmit}>
