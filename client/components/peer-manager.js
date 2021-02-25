@@ -104,7 +104,7 @@ export class PeerManager extends React.Component {
     return (
       <div id="video-display">
         {participants.map((participant) => {
-          const [id, stream] = participant
+          const [id] = participant
           return (
             /* <video
               key={id}
