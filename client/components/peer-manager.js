@@ -56,10 +56,18 @@ export class PeerManager extends React.Component {
        * we've joined the room.
        */
 
-      socket.emit('add-peer', myId)
+      socket.emit('add-peer', myId, roomId)
     })
 
-    socket.on('dispatch-add-peer', (newUserId) => {
+    socket.on('dispatch-add-peer', (newUserId, newUserRoomId) => {
+      /**
+       * This if-check prevents us from adding
+       * room participants if they're not in
+       * our room.
+       */
+
+      if (newUserRoomId !== roomId) return
+
       const call = this.self.call(newUserId, myStream)
 
       /**
