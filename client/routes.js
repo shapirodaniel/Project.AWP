@@ -25,7 +25,7 @@ class Routes extends Component {
           <Switch>
             {/* Routes placed here are only available after logging in */}
             <Route path="/home" component={UserHome} />
-            <Route path="/rooms/:room" component={PeerManager} />
+            <Route path="/rooms/:roomId" component={PeerManager} />
           </Switch>
         )}
         {/* Displays our Login component as a fallback */}

@@ -13,12 +13,12 @@ export const UserHome = ({email, setCurrentRoom}) => {
       <h3>Welcome, {email}!</h3>
       <div>Select a room:</div>
       <div id="room-container">
-        <Link to="/rooms/red" onClick={setCurrentRoom('red')}>
+        <Link to="/rooms/red" onClick={() => setCurrentRoom('red')}>
           <div>
             <span>Red</span>
           </div>
         </Link>
-        <Link to="/rooms/blue" onClick={setCurrentRoom('blue')}>
+        <Link to="/rooms/blue" onClick={() => setCurrentRoom('blue')}>
           <div>
             <span>Blue</span>
           </div>

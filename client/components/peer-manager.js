@@ -21,7 +21,7 @@ export class PeerManager extends React.Component {
   }
 
   componentDidMount() {
-    const roomId = this.props.room.id
+    const roomId = this.props.match.params.roomId
 
     // first, attach listener to open event
     // so that we have access to this.self.id
@@ -41,14 +41,22 @@ export class PeerManager extends React.Component {
   }
 
   connectToPeers() {
-    const roomId = this.props.room.id
+    const roomId = this.props.match.params.roomId
 
-    const participants = [...this.props.room.peers].filter(
-      (peer) => peer.id !== this.self.id
-    )
+    /* this.props.room.peers is an object
+     * we unpack it with Object.entries()
+     * each peer is a key-val pair that's been
+     * converted to a subarray: [ id, stream ]
+     */
+
+    const participants = Object.entries(
+      this.props.rooms[this.props.match.params.roomId].peers
+    ).filter((peer) => peer[0] !== this.self.id)
+
+    const myRoom = this.props.rooms[this.props.match.params.roomId]
 
     // after componentDidMount, our id/stream is available
-    const myStream = this.props.room.peers[this.self.id].stream
+    const myStream = myRoom[this.self.id]
 
     // answer any calls to self with myStream
     this.self.on('call', (call) => {
@@ -76,7 +84,9 @@ export class PeerManager extends React.Component {
   render() {
     // unfiltered, as we'd like to show our video
     // as well as our peers' videos!
-    const participants = Object.entries(this.props.room.peers)
+    const participants = Object.entries(
+      this.props.rooms[this.props.match.params.roomId].peers
+    )
 
     return (
       <div className="video-container">
@@ -86,8 +96,8 @@ export class PeerManager extends React.Component {
             <video
               key={id}
               id={id}
-              muted="true"
-              srcObject={stream}
+              muted={true}
+              src={stream}
               onLoadedMetadata={(e) => {
                 e.target.play()
               }}
@@ -102,12 +112,11 @@ export class PeerManager extends React.Component {
 /**
  * CONTAINER
  */
-const mapState = (state) => {
+const mapState = (state) => ({
   // get room identifier from routeProps /:room wildcard
-  // use it to select the room we're in
-  // room: state.rooms[this.props.match.params.room],
-  return {room: state.rooms[state.currentRoom]}
-}
+  // use it to select the room we're in from this.props.rooms
+  rooms: state.rooms,
+})
 
 const mapDispatch = (dispatch) => ({
   // these thunks add userId: stream key-val pairs
@@ -128,5 +137,5 @@ PeerManager.propTypes = {
   // room needs to have at least name, port associated with it
   // because there will need to be a different Peer instance
   // listening to each room
-  room: PropTypes.object.isRequired,
+  rooms: PropTypes.object.isRequired,
 }
