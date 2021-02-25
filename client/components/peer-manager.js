@@ -26,12 +26,6 @@ export class PeerManager extends React.Component {
       host: 'localhost',
       port: 9000,
     })
-
-    socket.on('dispatch-add-peer', (data) => {
-      console.log('this is add-peer data bounced back from server: ', data)
-      if (this.self.id !== data.userId)
-        console.log('hi im bouncing userId back: ', data.userId)
-    })
   }
 
   componentDidMount() {
@@ -50,6 +44,19 @@ export class PeerManager extends React.Component {
       socket.emit('add-peer', myId)
 
       await this.props.addStreamToRoom(roomId, myId, myStream)
+
+      socket.on('dispatch-add-peer', (newUserId) => {
+        console.log(
+          'this is add-peer data bounced back from server: ',
+          newUserId
+        )
+
+        const call = this.self.call(newUserId, myStream)
+      })
+    })
+
+    this.self.on('call', (call) => {
+      console.log('this is call received from another user, ', call)
     })
 
     // then, connect to everyone else in the room
