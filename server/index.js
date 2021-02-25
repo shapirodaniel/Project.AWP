@@ -95,10 +95,30 @@ const createApp = () => {
 }
 
 const startListening = () => {
-  // start listening (and create a 'server' object representing our server)
-  const server = app.listen(PORT, () =>
-    console.log(`Mixing it up on port ${PORT}`)
-  )
+  /**
+   * This is PeerServer JS's public STUN/TURN server
+   * which we'll set up to use SSL so we can
+   * connect to users on different devices
+   * than the one we're using to serve the app
+   */
+
+  const fs = require('fs')
+  const https = require('https')
+  const {PeerServer} = require('peer')
+
+  const sslConfig = {
+    key: fs.readFileSync(path.resolve('server/server.key')),
+    cert: fs.readFileSync(path.resolve('server/server.crt')),
+  }
+
+  const peerServer = PeerServer({
+    port: 9000,
+    path: '/',
+    ssl: sslConfig,
+  })
+
+  const server = https.createServer(sslConfig, app)
+  server.listen(3000)
 
   // set up our socket control center
   const io = socketio(server)
