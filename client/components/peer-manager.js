@@ -76,21 +76,24 @@ export class PeerManager extends React.Component {
   render() {
     // unfiltered, as we'd like to show our video
     // as well as our peers' videos!
-    const participants = [...this.props.room.peers]
+    const participants = Object.entries(this.props.room.peers)
 
     return (
       <div className="video-container">
-        {participants.map((participant) => (
-          <video
-            key={participant.id}
-            id={participant.id}
-            muted="true"
-            srcObject={participant.stream}
-            onLoadedMetadata={(e) => {
-              e.target.play()
-            }}
-          />
-        ))}
+        {participants.map((participant) => {
+          const [id, stream] = participant
+          return (
+            <video
+              key={id}
+              id={id}
+              muted="true"
+              srcObject={stream}
+              onLoadedMetadata={(e) => {
+                e.target.play()
+              }}
+            />
+          )
+        })}
       </div>
     )
   }

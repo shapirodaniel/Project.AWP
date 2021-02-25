@@ -18,7 +18,7 @@ export const UserHome = ({email, setCurrentRoom}) => {
             <span>Red</span>
           </div>
         </Link>
-        <Link to="/rooms/blue" room="blue">
+        <Link to="/rooms/blue" onClick={setCurrentRoom('blue')}>
           <div>
             <span>Blue</span>
           </div>
