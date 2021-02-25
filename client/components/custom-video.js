@@ -31,7 +31,7 @@ class CustomVideoElement extends React.Component {
 
 const mapState = (state) => ({
   rooms: state.rooms,
-  currentRoom: state.currentRoom,
+  currentRoom: state.currentRoom || 'red',
 })
 
 export default connect(mapState)(CustomVideoElement)

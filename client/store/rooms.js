@@ -1,25 +1,29 @@
+import socket from '../socket'
+
 const ADD_PEER = 'ADD_PEER'
 const REMOVE_PEER = 'REMOVE_PEER'
 
-const addPeer = (roomId, userId, stream) => ({
+export const addPeer = ({roomId, userId, stream}) => ({
   type: ADD_PEER,
   roomId,
   userId,
   stream,
 })
 
-const removePeer = (roomId, userId) => ({
+export const removePeer = ({roomId, userId}) => ({
   type: REMOVE_PEER,
   roomId,
   userId,
 })
 
 export const fetchAddPeer = (roomId, userId, stream) => (dispatch) => {
-  dispatch(addPeer(roomId, userId, stream))
+  dispatch(addPeer({roomId, userId, stream}))
+  // socket.emit('add-peer', {roomId, userId, stream})
 }
 
 export const fetchRemovePeer = (roomId, userId) => (dispatch) => {
-  dispatch(removePeer(roomId, userId))
+  dispatch(removePeer({roomId, userId}))
+  // socket.emit('remove-peer', {roomId, userId})
 }
 
 // roomIds are red, blue

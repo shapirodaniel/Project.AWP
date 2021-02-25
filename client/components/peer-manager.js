@@ -1,8 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {fetchAddPeer, fetchRemovePeer} from '../store/rooms'
+import {
+  addPeer,
+  removePeer,
+  fetchAddPeer,
+  fetchRemovePeer,
+} from '../store/rooms'
 import CustomVideoElement from './custom-video'
+import socket from '../socket'
+import store from '../store'
 
 /**
  * COMPONENT
@@ -19,6 +26,12 @@ export class PeerManager extends React.Component {
       host: 'localhost',
       port: 9000,
     })
+
+    socket.on('dispatch-add-peer', (data) => {
+      console.log('this is add-peer data bounced back from server: ', data)
+      if (this.self.id !== data.userId)
+        console.log('hi im bouncing userId back: ', data.userId)
+    })
   }
 
   componentDidMount() {
@@ -33,6 +46,8 @@ export class PeerManager extends React.Component {
         video: true,
         audio: true,
       })
+
+      socket.emit('add-peer', myId)
 
       await this.props.addStreamToRoom(roomId, myId, myStream)
     })
@@ -51,6 +66,12 @@ export class PeerManager extends React.Component {
     )
 
     if (prevPeers.length !== peers.length) this.connectToPeers()
+  }
+
+  componentWillUnmount() {
+    const roomId = this.props.match.params.roomId
+    const userId = this.self._id
+    this.props.removeStreamFromRoom(roomId, userId)
   }
 
   connectToPeers() {
@@ -81,7 +102,7 @@ export class PeerManager extends React.Component {
     // when they call us. If someone gets dropped,
     // the store will be updated and the component
     // will re-render without that peer
-    participants.forEach((peer) => {
+    /* participants.forEach((peer) => {
       const call = this.self.call(peer.userId, peer.stream)
 
       call.on('stream', () => {
@@ -91,7 +112,7 @@ export class PeerManager extends React.Component {
       call.on('close', () => {
         this.props.removeStreamFromRoom(roomId, peer.userId)
       })
-    })
+    }) */
   }
 
   render() {
