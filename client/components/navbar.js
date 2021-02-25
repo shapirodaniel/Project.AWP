@@ -7,7 +7,7 @@ import {logout} from '../store'
 const Navbar = ({handleClick, isLoggedIn}) => (
   <div>
     <div className="topline-banner">
-      <img src="https://i.imgur.com/GCv6lZU.jpg" />
+      <img src="https://i.imgur.com/E5nkxzt.png" />
       <div>
         <div className="titleCopy">
           <h1>REDFISH / BLUEFISH</h1>

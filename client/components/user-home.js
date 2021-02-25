@@ -9,17 +9,17 @@ import {fetchSetCurrentRoom} from '../store/currentRoom'
  */
 export const UserHome = ({email, setCurrentRoom}) => {
   return (
-    <div>
-      <h3>Welcome, {email}!</h3>
-      <div>Select a room:</div>
+    <div className="userHome-container">
+      <h2>Welcome, {email}!</h2>
+      <div className="selectRoom">Select a room:</div>
       <div id="room-container">
         <Link to="/rooms/red" onClick={() => setCurrentRoom('red')}>
-          <div>
+          <div className="roomCard red">
             <span>Red</span>
           </div>
         </Link>
         <Link to="/rooms/blue" onClick={() => setCurrentRoom('blue')}>
-          <div>
+          <div className="roomCard blue">
             <span>Blue</span>
           </div>
         </Link>
