@@ -38,6 +38,10 @@ export class PeerManager extends React.Component {
         audio: true,
       })
 
+      store.dispatch(
+        addPeer({roomId: roomId, userId: this.self._id, stream: myStream})
+      )
+
       socket.emit('add-peer', myId)
 
       socket.on('dispatch-add-peer', (newUserId) => {
