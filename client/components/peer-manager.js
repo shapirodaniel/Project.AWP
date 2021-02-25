@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import VideoDisplay from './components'
-import socket from '../socket'
+import {fetchAddPeer, fetchRemovePeer} from '../store/room'
 
 /**
  * COMPONENT
@@ -12,98 +11,74 @@ export class PeerManager extends React.Component {
     super(props)
 
     // peer.min.js served from public/index.html
-    // Peers should be established by/in thunk
-    // undef so Peer constructor assigns a random ID
+    // the Peer constructor assigns a random ID if
+    // one isn't chosen, which is why we've left
+    // the first argument undefined
     this.self = new Peer(undefined, {
       host: this.props.room.name,
       port: this.props.room.port,
     })
-
-    this.state = {
-      peers: {},
-    }
   }
 
-  /* all of this state has to be managed by redux,
-     else videodisplay can't be a separate element,
-     since prop drilling will get ugly ... */
+  componentDidMount() {
+    const roomId = this.props.room.id
 
-  // add peer to this.self
-  addPeer(userId, stream) {
-    this.setState({
-      ...this.state,
-      peers: {
-        ...this.state.peers,
-        [userId]: {
-          userId,
-          stream,
-        },
-      },
+    // first, attach listener to open event
+    // so that we have access to this.self.id
+    // and add self to room
+    this.self.on('open', async (myId) => {
+      // get my stream and add to room
+      const myStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      })
+
+      await this.props.addStreamToRoom(roomId, myId, myStream)
     })
+
+    // then, connect to everyone else in the room
+    this.connectToPeers()
   }
 
-  // remove peer from this.self
-  removePeer(userId) {
-    this.setState({
-      ...this.state,
-      peers: {
-        ...this.state.peers.filter((peer) => peer.userId !== userId),
-      },
-    })
-  }
+  connectToPeers() {
+    const roomId = this.props.room.id
 
-  async connectToPeers() {
-    // participants are whichever users have been associated
-    // with a particular room, handled by sockets
-    const {participants} = this.props.room
+    const participants = [...this.props.room.peers].filter(
+      (peer) => peer.id !== this.self.id
+    )
 
-    // get my stream
-    const myStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    })
+    // after componentDidMount, our id/stream is available
+    const myStream = this.props.room.peers[this.self.id].stream
 
-    this.self.on('open', (id) => {
-      // add self to room's list of participants
-      // need a thunk to do this:
-      socket.emit('join-room', ROOM_ID, id)
-    })
-
-    // assign listener for calls to this.self
-    // answer calls to this.self with myStream
+    // answer any calls to self with myStream
     this.self.on('call', (call) => {
       call.answer(myStream)
     })
 
-    // set local state for each participant
-    // as userId: stream
-    participants.forEach((participant) =>
-      this.addPeer(participant.id, participant.stream)
-    )
-
-    // call each peer in room
-    this.state.peers.forEach((peer) => {
+    // Assign a call to each participant in the room
+    // this will allow us to add and remove peers
+    // when they call us. If someone gets dropped,
+    // the store will be updated and the component
+    // will re-render without that peer
+    participants.forEach((peer) => {
       const call = this.self.call(peer.userId, peer.stream)
 
-      call.on('stream', (stream) => {
-        this.addPeer(peer.userId, stream)
+      call.on('stream', () => {
+        this.props.addStreamToRoom(roomId, peer.userId, peer.stream)
       })
 
       call.on('close', () => {
-        this.removePeer(peer.userId)
+        this.props.removeStreamFromRoom(roomId, peer.userId)
       })
     })
   }
 
-  componentDidMount() {
-    this.connectToPeers()
-  }
-
   render() {
-    const participants = [...this.state.peers]
-    this.connectToPeers()
+    // unfiltered, as we'd like to show our video
+    // as well as our peers' videos!
+    const participants = [...this.props.room.peers]
+
     return (
-      /* video display ele */
       <div className="video-container">
         {participants.map((participant) => (
           <video
@@ -125,13 +100,19 @@ export class PeerManager extends React.Component {
  * CONTAINER
  */
 const mapState = (state) => ({
-  // room will need to keep track of its users
-  room: state.room,
+  // get room identifier from routeProps /:room wildcard
+  // use it to select the room we're in
+  room: state.rooms[this.props.match.params.room],
 })
 
 const mapDispatch = (dispatch) => ({
-  addStreamToRoom: () => dispatch(/* add stream to room thunk */),
-  removeStreamFromRoom: () => dispatch(/* remove stream from room thunk */),
+  // these thunks add userId: stream key-val pairs
+  // to whichever room we're in
+  // by
+  addStreamToRoom: (roomId, userId, stream) =>
+    dispatch(fetchAddPeer(roomId, userId, stream)),
+  removeStreamFromRoom: (roomId, userId) =>
+    dispatch(fetchRemovePeer(roomId, userId)),
 })
 
 export default connect(mapState, mapDispatch)(PeerManager)
@@ -143,5 +124,5 @@ PeerManager.propTypes = {
   // room needs to have at least name, port associated with it
   // because there will need to be a different Peer instance
   // listening to each room
-  room: PropTypes.string.isRequired,
+  room: PropTypes.object.isRequired,
 }

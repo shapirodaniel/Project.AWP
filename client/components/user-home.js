@@ -7,20 +7,23 @@ import {Link} from 'react-router-dom'
  * COMPONENT
  */
 export const UserHome = (props) => {
-  const {name, rooms} = props
+  const {name} = props
 
   return (
     <div>
       <h3>Welcome, {name}!</h3>
-      <div>Select a room or start a new one:</div>
+      <div>Select a room:</div>
       <div id="room-container">
-        {rooms.map((room) => (
-          <div key={room.id}>
-            <Link to={`/room/${room.id}`}>
-              <span className="room">{room.name}</span>
-            </Link>
+        <Link to="/rooms/red">
+          <div>
+            <span>Red</span>
           </div>
-        ))}
+        </Link>
+        <Link to="/rooms/blue">
+          <div>
+            <span>Blue</span>
+          </div>
+        </Link>
       </div>
     </div>
   )
@@ -29,12 +32,9 @@ export const UserHome = (props) => {
 /**
  * CONTAINER
  */
-const mapState = (state) => {
-  return {
-    name: state.user.displayName,
-    rooms: state.rooms,
-  }
-}
+const mapState = (state) => ({
+  name: state.user.displayName,
+})
 
 export default connect(mapState)(UserHome)
 
@@ -43,5 +43,4 @@ export default connect(mapState)(UserHome)
  */
 UserHome.propTypes = {
   name: PropTypes.string.isRequired,
-  rooms: PropTypes.array.isRequired,
 }

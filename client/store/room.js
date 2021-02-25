@@ -7,48 +7,61 @@ const REMOVE_ROOM = 'REMOVE_ROOM'
 const ADD_PEER = 'ADD_PEER'
 const REMOVE_PEER = 'REMOVE_PEER'
 
-const addPeer = (userId, stream) => ({
+const addPeer = (roomId, userId, stream) => ({
   type: ADD_PEER,
+  roomId,
   userId,
   stream,
 })
 
-const removePeer = (userId) => ({
+const removePeer = (roomId, userId) => ({
   type: REMOVE_PEER,
+  roomId,
   userId,
 })
 
-// thunks
-export const fetchAddPeer = (userId, stream) => async (dispatch) => {
-  try {
-    dispatch(addPeer(userId, stream))
-  } catch (err) {
-    console.error(err)
-  }
+export const fetchAddPeer = (roomId, userId, stream) => (dispatch) => {
+  dispatch(addPeer(roomId, userId, stream))
 }
 
-const initState = {
-  roomId: {
+export const fetchRemovePeer = (roomId, userId) => (dispatch) => {
+  dispatch(removePeer(roomId, userId))
+}
+
+// roomIds are red, blue
+const rooms = {
+  red: {
+    id: 'red',
+    peers: {},
+  },
+  blue: {
+    id: 'blue',
     peers: {},
   },
 }
 
-export default (state = initState, action) => {
+export default (state = rooms, action) => {
   switch (action.type) {
     case ADD_PEER:
       return {
         ...state,
-        peers: {
-          ...state.peers,
-          [action.userId]: action.stream,
+        [action.roomId]: {
+          ...state[action.roomId],
+          peers: {
+            ...state[action.roomId].peers,
+            [action.userId]: action.stream,
+          },
         },
       }
     case REMOVE_PEER:
-      const updatedPeers = state.peers
+      let updatedPeers = {...state[action.roomId].peers}
       delete updatedPeers[action.userId]
       return {
         ...state,
-        peers: updatedPeers,
+        [action.roomId]: {
+          ...state[action.roomId],
+          peers: updatedPeers,
+        },
       }
     default:
       return state
