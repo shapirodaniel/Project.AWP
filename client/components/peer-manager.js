@@ -154,8 +154,10 @@ export class PeerManager extends React.Component {
   render() {
     const roomId = this.props.match.params.roomId
 
-    // convert { room userId: MediaStream } key-val pairs
-    // to array of arrays so that we can map it
+    /* convert { room userId: MediaStream } key-val pairs
+     * on state.room to array of arrays so that we can map it
+     */
+
     const participants = Object.entries(this.props.rooms[roomId].peers)
 
     return (
