@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {fetchAddPeer, fetchRemovePeer} from '../store/rooms'
+import CustomVideoElement from './custom-video'
 
 /**
  * COMPONENT
@@ -89,11 +90,11 @@ export class PeerManager extends React.Component {
     )
 
     return (
-      <div className="video-container">
+      <div id="video-display">
         {participants.map((participant) => {
           const [id, stream] = participant
           return (
-            <video
+            /* <video
               key={id}
               id={id}
               muted={true}
@@ -101,7 +102,8 @@ export class PeerManager extends React.Component {
               onLoadedMetadata={(e) => {
                 e.target.play()
               }}
-            />
+            /> */
+            <CustomVideoElement key={id} id={id} />
           )
         })}
       </div>
