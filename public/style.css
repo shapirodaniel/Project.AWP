@@ -19,10 +19,6 @@ a {
   color: black;
 }
 
-nav a:hover {
-  color: var(--blueAccent);
-}
-
 label {
   display: block;
 }
@@ -30,11 +26,20 @@ label {
 nav a {
   display: inline-block;
   margin: 1em;
+  font-size: 1.2em;
+}
+
+nav a:hover {
+  color: var(--blueAccent);
 }
 
 form div {
   margin: 1em;
   display: inline-block;
+}
+
+button {
+  cursor: pointer;
 }
 
 /* ---- Navbar ---- */
@@ -131,8 +136,8 @@ nav {
   margin-top: 1em;
 }
 
-.authForm-container input[type='text'],
-.authForm-container input[name='password'],
+.authForm-container input[type="text"],
+.authForm-container input[name="password"],
 .authForm-container button {
   height: 2.6em;
   width: 90%;

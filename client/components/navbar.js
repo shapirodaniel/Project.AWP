@@ -1,10 +1,10 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
-import {logout} from '../store'
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
+import { logout } from "../store";
 
-const Navbar = ({handleClick, isLoggedIn}) => (
+const Navbar = ({ handleClick, isLoggedIn }) => (
   <div>
     <div className="topline-banner">
       <Link to="/home">
@@ -14,7 +14,7 @@ const Navbar = ({handleClick, isLoggedIn}) => (
         <Link to="/home">
           <div className="titleCopy">
             <h1>REDFISH / BLUEFISH</h1>
-            <span>a webRTC video-chat app</span>
+            <span>a WebRTC video-chat app</span>
           </div>
         </Link>
         <nav>
@@ -37,7 +37,7 @@ const Navbar = ({handleClick, isLoggedIn}) => (
       </div>
     </div>
   </div>
-)
+);
 
 /**
  * CONTAINER
@@ -45,18 +45,18 @@ const Navbar = ({handleClick, isLoggedIn}) => (
 const mapState = (state) => {
   return {
     isLoggedIn: !!state.user.id,
-  }
-}
+  };
+};
 
 const mapDispatch = (dispatch) => {
   return {
     handleClick() {
-      dispatch(logout())
+      dispatch(logout());
     },
-  }
-}
+  };
+};
 
-export default connect(mapState, mapDispatch)(Navbar)
+export default connect(mapState, mapDispatch)(Navbar);
 
 /**
  * PROP TYPES
@@ -64,4 +64,4 @@ export default connect(mapState, mapDispatch)(Navbar)
 Navbar.propTypes = {
   handleClick: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
-}
+};
