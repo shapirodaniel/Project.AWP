@@ -7,12 +7,16 @@ import {logout} from '../store'
 const Navbar = ({handleClick, isLoggedIn}) => (
   <div>
     <div className="topline-banner">
-      <img src="https://i.imgur.com/E5nkxzt.png" />
+      <Link to="/home">
+        <img src="https://i.imgur.com/E5nkxzt.png" />
+      </Link>
       <div>
-        <div className="titleCopy">
-          <h1>REDFISH / BLUEFISH</h1>
-          <span>a webRTC video-chat app</span>
-        </div>
+        <Link to="/home">
+          <div className="titleCopy">
+            <h1>REDFISH / BLUEFISH</h1>
+            <span>a webRTC video-chat app</span>
+          </div>
+        </Link>
         <nav>
           {isLoggedIn ? (
             <div>
