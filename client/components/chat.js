@@ -80,7 +80,7 @@ class Chat extends React.Component {
         <div id="messages">
           {messages.map(([id, content]) => (
             <div className="chatEntry" key={id}>
-              <div className="chatName">{content.email}</div>
+              <div className="chatName">{content.email} ></div>
               <div className="chatMessage">{content.message}</div>
             </div>
           ))}

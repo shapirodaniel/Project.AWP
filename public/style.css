@@ -1,5 +1,17 @@
+/* ---- root vars ---- */
+
+:root {
+  --blueAccent: #3981ef;
+  --redAccent: #d12b39;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: sans-serif;
+  height: 100vh;
 }
 
 a {
@@ -18,4 +30,264 @@ nav a {
 form div {
   margin: 1em;
   display: inline-block;
+}
+
+/* ---- Navbar ---- */
+
+.topline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.topline-banner img {
+  height: 120px;
+  width: auto;
+}
+
+.topline-banner h1 {
+  margin-left: 2em;
+}
+
+nav {
+  position: fixed;
+  right: 40px;
+  top: 84px;
+}
+
+.titleCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* ---- AuthForm ---- */
+
+.outer-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  width: auto;
+  font-size: 1.6em;
+  padding: 2em 0;
+}
+
+.authForm-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  height: min-content;
+}
+
+.authForm-container * {
+  border-radius: 5px;
+}
+
+.authForm-container div {
+  width: 100%;
+  margin-top: 0;
+}
+
+.authForm-container form {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid #fff;
+  padding: 1em;
+  background: linear-gradient(#3981ef, #f82b2b);
+  color: rgb(235, 235, 235);
+  width: 380px;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+.authForm-container form div {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.authForm-container label {
+  font-weight: normal;
+  letter-spacing: 0.8px;
+  align-self: flex-start;
+  margin-left: 0.8em;
+}
+
+.authForm-container label:nth-child(1) {
+  margin-top: 1em;
+}
+
+.authForm-container input[type='text'],
+.authForm-container input[name='password'],
+.authForm-container button {
+  height: 2.6em;
+  width: 90%;
+  padding: 0 1em;
+  font-size: 0.6em;
+  letter-spacing: 0.8px;
+  text-align: center;
+}
+
+.authForm-container button {
+  width: 90%;
+  font-size: 0.8em;
+  margin-top: 1em;
+}
+
+.authForm-container a {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 380px;
+  height: 3em;
+  border: 1px solid var(--blueAccent);
+  background-color: #fff;
+  margin-top: 0.6em;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+.authForm-container a img {
+  height: 2.2em;
+  width: auto;
+}
+
+.authForm-container span {
+  margin-right: 1em;
+}
+
+.warning {
+  font-size: 0.6em;
+}
+
+/* ---- UserHome ---- */
+
+.userHome-container {
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.userHome-container h2 {
+  text-align: center;
+  margin-bottom: 2em;
+}
+
+#room-container {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectRoom {
+  font-size: 1.8em;
+  margin-bottom: 1.6em;
+}
+
+.roomCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  width: 300px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  background-color: #bbb;
+  font-size: 1.4em;
+}
+
+.roomCard.red {
+  background-color: var(--redAccent);
+  margin-right: 2em;
+}
+
+.roomCard.blue {
+  background-color: var(--blueAccent);
+}
+
+.roomCard a,
+.roomCard span {
+  color: #fff;
+  font-size: 2em;
+}
+
+/* ---- VideoChat Container ---- */
+/* both PeerManager, Chat live here */
+
+.videoChat-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ---- PeerManager ---- */
+
+#video-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  grid-auto-rows: 200px;
+  column-gap: 5px;
+  row-gap: 50px;
+  width: 70%;
+  max-width: 900px;
+  padding: 2em 1em 1em 1em;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* reflect image over y-axis */
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  margin-top: 1em;
+}
+
+.videoName {
+  width: 140px;
+  margin: 0 auto;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+/* ---- Chat ---- */
+
+#chat-display {
+  width: 30%;
+  height: 70vh;
+  border: 1px solid grey;
+  margin-top: 2.7em;
+}
+
+.chatEntry {
+  padding: 0.8em;
+  line-height: 1.4em;
+}
+
+.chatEntry:nth-child(2) {
+  background-color: #eee;
+}
+
+.chatName {
+  text-align: left;
+}
+
+.chatMessage {
+  text-align: right;
 }
