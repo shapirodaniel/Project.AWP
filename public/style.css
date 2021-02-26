@@ -243,7 +243,7 @@ nav {
   grid-template-columns: repeat(auto-fill, 200px);
   grid-auto-rows: 200px;
   column-gap: 5px;
-  row-gap: 50px;
+  row-gap: 5px;
   width: 70%;
   max-width: 900px;
   padding: 2em 1em 1em 1em;
@@ -272,8 +272,13 @@ video {
 #chat-display {
   width: 30%;
   height: 70vh;
-  border: 1px solid grey;
   margin-top: 2.7em;
+}
+
+#messages {
+  height: min-content;
+  max-height: 340px;
+  overflow-y: auto;
 }
 
 .chatEntry {
@@ -281,7 +286,7 @@ video {
   line-height: 1.4em;
 }
 
-.chatEntry:nth-child(2) {
+.chatEntry:nth-child(even) {
   background-color: #eee;
 }
 
@@ -300,8 +305,20 @@ video {
   width: 100%;
 }
 
-#chatInputAndButton input[type='textarea'] {
-  margin-left: 0.35em;
-  width: 28%;
-  height: 4em;
+textarea {
+  margin-bottom: 1.6em;
+  width: 30%;
+  height: 80px;
+  resize: vertical;
+  word-wrap: break-word;
+  padding: 0.5em;
+  border: 1px solid black;
+  font-family: sans-serif;
+  font-size: 1.2em;
+}
+
+#chatInputAndButton button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
 }

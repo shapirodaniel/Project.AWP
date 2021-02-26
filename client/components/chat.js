@@ -80,17 +80,14 @@ class Chat extends React.Component {
         <div id="messages">
           {messages.map(([id, content]) => (
             <div className="chatEntry" key={id}>
-              <div className="chatName">
-                {content.email} {'>'}
-              </div>
+              <div className="chatName">{content.email + ' >'}</div>
               <div className="chatMessage">{content.message}</div>
             </div>
           ))}
         </div>
         <div id="chatInputAndButton">
           <form onSubmit={handleSubmit}>
-            <input
-              type="textarea"
+            <textarea
               name="message"
               value={this.state.message || ''}
               onChange={handleChange}
