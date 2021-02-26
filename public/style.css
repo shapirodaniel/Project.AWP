@@ -307,7 +307,7 @@ video {
 
 textarea {
   margin-bottom: 1.6em;
-  width: 30%;
+  width: 29%;
   height: 80px;
   resize: vertical;
   word-wrap: break-word;
@@ -321,4 +321,5 @@ textarea {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  padding: 0.3em 0.6em;
 }
