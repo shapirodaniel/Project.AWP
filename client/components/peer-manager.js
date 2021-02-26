@@ -170,11 +170,16 @@ export class PeerManager extends React.Component {
      */
 
     return (
-      <div>
+      <div className="videoChat-container">
         <div id="video-display">
           {participants.map((participant) => {
             const [id] = participant
-            return <CustomVideoElement key={id} id={id} roomId={roomId} />
+            return (
+              <div key={id}>
+                <CustomVideoElement id={id} roomId={roomId} />
+                <div className="videoName">{this.props.user.email}</div>
+              </div>
+            )
           })}
         </div>
         <div id="chat-display">
@@ -189,6 +194,7 @@ export class PeerManager extends React.Component {
  * CONTAINER
  */
 const mapState = (state) => ({
+  user: state.user,
   rooms: state.rooms,
 })
 
