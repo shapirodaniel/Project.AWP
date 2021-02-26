@@ -101,7 +101,7 @@ nav {
   border: 1px solid #fff;
   padding: 1em;
   background: linear-gradient(#3981ef, #f82b2b);
-  color: rgb(235, 235, 235);
+  color: #fff;
   width: 380px;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
 }
@@ -119,6 +119,7 @@ nav {
   letter-spacing: 0.8px;
   align-self: flex-start;
   margin-left: 0.8em;
+  margin-bottom: 0.3em;
 }
 
 .authForm-container label:nth-child(1) {

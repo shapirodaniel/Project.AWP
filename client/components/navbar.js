@@ -11,7 +11,7 @@ const Navbar = ({handleClick, isLoggedIn}) => (
       <div>
         <div className="titleCopy">
           <h1>REDFISH / BLUEFISH</h1>
-          <span>a webRTC Zoom clone</span>
+          <span>a webRTC video-chat app</span>
         </div>
         <nav>
           {isLoggedIn ? (
