@@ -5,5 +5,5 @@ secrets.js
 .DS_Store
 npm-debug.log
 yarn-error.log
-server/server.crt
-server/server.key
+server.crt
+server.key
