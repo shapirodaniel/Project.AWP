@@ -1,211 +1,204 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {fetchAddPeer, fetchRemovePeer} from '../store/rooms'
-import CustomVideoElement from './custom-video'
-import Chat from './chat'
-import socket from '../socket'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { fetchAddPeer, fetchRemovePeer } from '../store/rooms';
+import CustomVideoElement from './custom-video';
+import Chat from './chat';
+import socket from '../socket';
 
 /**
  * COMPONENT
  */
 export class PeerManager extends React.Component {
-  constructor(props) {
-    super(props)
+	constructor(props) {
+		super(props);
+		this.state = {
+			justRemovedStream: false,
+		};
 
-    /**
-     * The Peer constructor below is served by peer.min.js
-     * from public/index.html.
-     *
-     * It assigns a random ID if one isn't chosen,
-     * which is why the first arg to new Peer() has
-     * been declared as undefined.
-     */
+		/**
+		 * The Peer constructor below is served by peer.min.js
+		 * from public/index.html.
+		 *
+		 * It assigns a random ID if one isn't chosen,
+		 * which is why the first arg to new Peer() has
+		 * been declared as undefined.
+		 */
 
-    this.self = new Peer(undefined, {
-      host: 'localhost',
-      port: 9000,
-    })
-  }
+		this.self = new Peer(undefined, {
+			host: 'localhost',
+			port: 9000,
+		});
 
-  handlePeerConnections() {
-    const roomId = this.props.match.params.roomId
+		const roomId = this.props.match.params.roomId;
 
-    /**
-     * myStream is defined outside Peer event listeners
-     * so that we can reuse it for sockets and Peer events
-     */
+		socket.on('dispatch-user-left', id => {
+			this.props.removeStreamFromRoom(roomId, id);
+		});
 
-    let myStream
+		socket.on('dispatch-add-peer', (newUserId, newUserRoomId) => {
+			/**
+			 * This if-check prevents us from adding
+			 * room participants if they're not in
+			 * our room.
+			 */
 
-    /**
-     * On creation of this.self, myId is created --
-     * we'll use it to initialize our local MediaStream
-     * and add this.self to room.
-     */
+			if (newUserRoomId !== roomId) return;
 
-    this.self.on('open', async (myId) => {
-      myStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      })
+			const myStream = this.props.rooms[roomId].peers[this.self._id];
 
-      this.props.addStreamToRoom(roomId, this.self._id, myStream)
+			const call = this.self.call(newUserId, myStream);
 
-      /**
-       * Here we let other participants know
-       * we've joined the room.
-       */
+			/**
+			 * This if-check prevents TypeErrors
+			 * if peerStream isn't available.
+			 */
 
-      socket.emit('add-peer', myId, roomId)
-    })
+			if (call) {
+				call.on('stream', peerStream => {
+					this.props.addStreamToRoom(roomId, call.peer, peerStream);
+				});
+			}
+		});
+	}
 
-    socket.on('dispatch-add-peer', (newUserId, newUserRoomId) => {
-      /**
-       * This if-check prevents us from adding
-       * room participants if they're not in
-       * our room.
-       */
+	handlePeerConnections() {
+		const roomId = this.props.match.params.roomId;
 
-      if (newUserRoomId !== roomId) return
+		/**
+		 * myStream is defined outside Peer event listeners
+		 * so that we can reuse it for sockets and Peer events
+		 */
 
-      const call = this.self.call(newUserId, myStream)
+		let myStream;
 
-      /**
-       * This if-check prevents TypeErrors
-       * if peerStream isn't available.
-       */
+		/**
+		 * On creation of this.self, myId is created --
+		 * we'll use it to initialize our local MediaStream
+		 * and add this.self to room.
+		 */
 
-      if (call) {
-        call.on('stream', (peerStream) => {
-          this.props.addStreamToRoom(roomId, call.peer, peerStream)
-        })
-      }
-    })
+		this.self.on('open', async myId => {
+			myStream = await navigator.mediaDevices.getUserMedia({
+				video: true,
+				audio: true,
+			});
 
-    this.self.on('call', (call) => {
-      call.answer(myStream)
+			this.props.addStreamToRoom(roomId, this.self._id, myStream);
 
-      /**
-       * If this.self has an incoming call
-       * FROM this.self, the if-check below
-       * prevents us adding a duplicate stream
-       * to our video display.
-       */
+			/**
+			 * Here we let other participants know
+			 * we've joined the room.
+			 */
 
-      if (call.peer === this.self._id) {
-        return
-      }
+			socket.emit('add-peer', myId, roomId);
+		});
 
-      call.on('stream', (stream) => {
-        this.props.addStreamToRoom(roomId, call.peer, stream)
-      })
+		this.self.on('call', call => {
+			call.answer(myStream);
 
-      call.on('close', () => {
-        this.props.removeStreamFromRoom(roomId, call.peer)
-      })
-    })
-  }
+			/**
+			 * If this.self has an incoming call
+			 * FROM this.self, the if-check below
+			 * prevents us adding a duplicate stream
+			 * to our video display.
+			 */
 
-  componentDidMount() {
-    this.handlePeerConnections()
-  }
+			if (call.peer === this.self._id) {
+				return;
+			}
 
-  componentDidUpdate() {
-    /**
-     * Listen for peer disconnections
-     * to remove their dead stream
-     * from video display.
-     */
+			call.on('stream', peerStream => {
+				this.props.addStreamToRoom(roomId, call.peer, peerStream);
+			});
 
-    const roomId = this.props.match.params.roomId
+			call.on('close', () => {
+				if (
+					!Object.keys(this.props.rooms[roomId].peers).some(
+						peerId => peerId === call.peer
+					)
+				)
+					return;
+				this.props.removeStreamFromRoom(roomId, call.peer);
+			});
+		});
+	}
 
-    socket.on('dispatch-user-left', (id) => {
-      this.props.removeStreamFromRoom(roomId, id)
-    })
-  }
+	componentDidMount() {
+		this.handlePeerConnections();
+	}
 
-  componentWillUnmount() {
-    /**
-     * Here, we clean up streams from our room
-     * so that we don't see dead streams if
-     * we re-enter. We then call this.self.destroy()
-     * which disconnects our peer instance from
-     * peerserver, and let the serverside socket
-     * connection know we've left so that
-     * other room participants can remove our
-     * newly-dead stream.
-     */
+	componentWillUnmount() {
+		/**
+		 * Here, we clean up streams from our room
+		 * so that we don't see dead streams if
+		 * we re-enter. We then call this.self.destroy()
+		 * which disconnects our peer instance from
+		 * peerserver, and let the serverside socket
+		 * connection know we've left so that
+		 * other room participants can remove our
+		 * newly-dead stream.
+		 */
 
-    const roomId = this.props.match.params.roomId
-    const myPeers = this.props.rooms[roomId].peers
+		const roomId = this.props.match.params.roomId;
+		const myId = this.self._id;
+		this.self.destroy();
+		socket.emit('user-left', myId);
+	}
 
-    for (let key in myPeers) {
-      // linter complains if no ownProps check ...
-      if (myPeers[key] instanceof MediaStream) {
-        this.props.removeStreamFromRoom(roomId, key)
-      }
-    }
+	render() {
+		const roomId = this.props.match.params.roomId;
 
-    /**
-     * Important! myId needs to be stored before calling
-     * this.self.destroy() so that socket can broadcast
-     * that we've left the room and other participants
-     * can cleanup our dead stream.
-     */
+		const participants = Object.entries(this.props.rooms[roomId].peers);
 
-    const myId = this.self._id
-    this.self.destroy()
-    socket.emit('user-left', myId)
-  }
+		/**
+		 * Each participant in participants array
+		 * is a subarray: [ id, MediaStream ].
+		 */
 
-  render() {
-    const roomId = this.props.match.params.roomId
-
-    const participants = Object.entries(this.props.rooms[roomId].peers)
-
-    /**
-     * Each participant in participants array
-     * is a subarray: [ id, MediaStream ].
-     */
-
-    return (
-      <div className="videoChat-container">
-        <div id="video-display">
-          {participants.map((participant) => {
-            const [id] = participant
-            return <CustomVideoElement key={id} id={id} roomId={roomId} />
-          })}
-        </div>
-        <div id="chat-display">
-          <Chat roomId={roomId} />
-        </div>
-      </div>
-    )
-  }
+		return (
+			<div className='videoChat-container'>
+				<div id='video-display'>
+					{participants.map(participant => {
+						const [id] = participant;
+						return (
+							<CustomVideoElement
+								key={id}
+								id={id}
+								roomId={roomId}
+							/>
+						);
+					})}
+				</div>
+				<div id='chat-display'>
+					<Chat roomId={roomId} />
+				</div>
+			</div>
+		);
+	}
 }
 
 /**
  * CONTAINER
  */
-const mapState = (state) => ({
-  user: state.user,
-  rooms: state.rooms,
-})
+const mapState = state => ({
+	user: state.user,
+	rooms: state.rooms,
+});
 
-const mapDispatch = (dispatch) => ({
-  addStreamToRoom: (roomId, userId, stream) =>
-    dispatch(fetchAddPeer(roomId, userId, stream)),
+const mapDispatch = dispatch => ({
+	addStreamToRoom: (roomId, userId, stream) =>
+		dispatch(fetchAddPeer(roomId, userId, stream)),
 
-  removeStreamFromRoom: (roomId, userId) =>
-    dispatch(fetchRemovePeer(roomId, userId)),
-})
+	removeStreamFromRoom: (roomId, userId) =>
+		dispatch(fetchRemovePeer(roomId, userId)),
+});
 
-export default connect(mapState, mapDispatch)(PeerManager)
+export default connect(mapState, mapDispatch)(PeerManager);
 
 /**
  * PROP TYPES
  */
 PeerManager.propTypes = {
-  rooms: PropTypes.object.isRequired,
-}
+	rooms: PropTypes.object.isRequired,
+};
